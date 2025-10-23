@@ -1,0 +1,40 @@
+services:
+  backend:
+    image: "directory_of_organizations"
+    build:
+      context: ./directory_of_organizations
+    volumes:
+      - ./directory_of_organizations/:/app
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/directory_of_organizations_db
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "./wait-for-it.sh db:5432 --
+      alembic -c /app/app/models/alembic.ini upgrade head &&
+      gunicorn -k uvicorn.workers.UvicornWorker -c gunicorn_conf.py app.main:app"
+    depends_on:
+      - db
+    networks:
+      - internal
+
+  db:
+    image: postgres:16-alpine
+    restart: "no"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-directory_of_organizations_db}
+    expose:
+      - "5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    networks:
+      - internal
+
+volumes:
+  pg_data:
+
+networks:
+  internal:
+    driver: bridge

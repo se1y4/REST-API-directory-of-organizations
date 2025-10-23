@@ -1,0 +1,14 @@
+DEBUG: true
+
+service:
+  API_PREFIX: "/api"
+
+security:
+  API_TOKEN: YOUR_TOKEN_HERE
+
+database:
+  SERVER: db
+  PORT: 5432
+  DB: directory_of_organizations_db
+  USER: postgres
+  PASSWORD: postgres
